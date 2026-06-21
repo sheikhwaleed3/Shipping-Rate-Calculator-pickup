@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>WTICCL – Global Shipping Forwarder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --navy:#0A1628;--navy2:#0D1F3C;--navy3:#162847;
+  --gold:#C9952A;--gold2:#E8B84B;--gold3:#F5D07A;
+  --blue:#1B4FBF;--blue2:#2563EB;--blue3:#3B82F6;
+  --green:#059669;--amber:#D97706;--red:#DC2626;
+  --bg:#F8F9FC;--bgcard:#FFFFFF;--bg2:#EEF1F8;
+  --border:#DDE3F0;--border2:#C5CDE8;
+  --text:#1A2340;--muted:#5A6480;--white:#FFFFFF;
+}
+body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;min-height:100vh;}
+input,select,textarea{outline:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;}
+button{font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+.mono{font-family:'JetBrains Mono',monospace;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fade{animation:fadeIn .25s ease;}
+.app{display:flex;min-height:100vh;}
+.sidebar{width:240px;background:var(--navy);display:flex;flex-direction:column;flex-shrink:0;box-shadow:4px 0 24px rgba(10,22,40,.35);}
+.sidebar-logo{padding:22px 18px 20px;border-bottom:1px solid rgba(255,255,255,.08);}
+.logo-wrap{display:flex;align-items:center;gap:11px;}
+.logo-icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;background:linear-gradient(135deg,var(--gold),var(--gold2));}
+.logo-name{font-weight:800;font-size:16px;color:var(--white);}
+.logo-tag{font-size:9px;color:var(--gold3);margin-top:2px;text-transform:uppercase;letter-spacing:1.5px;font-weight:600;}
+.sidebar-nav{flex:1;padding:12px 0;}
+.nav-btn{display:flex;align-items:center;gap:10px;width:100%;padding:11px 18px;border:none;background:transparent;font-size:13px;font-weight:500;cursor:pointer;text-align:left;border-left:3px solid transparent;transition:all .15s;color:rgba(255,255,255,.5);}
+.nav-btn:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.85);}
+.nav-btn.active{font-weight:700;border-left-color:var(--gold2);background:rgba(201,149,42,.12);color:var(--gold3);}
+.nav-btn.active-admin{font-weight:700;border-left-color:var(--blue3);background:rgba(37,99,235,.15);color:#93C5FD;}
+.sidebar-footer{padding:16px 18px;border-top:1px solid rgba(255,255,255,.08);}
+.main{flex:1;padding:28px 36px;overflow-y:auto;max-height:100vh;}
+.card{background:var(--bgcard);border:1px solid var(--border);border-radius:12px;padding:22px;box-shadow:0 1px 4px rgba(10,22,40,.06);}
+.btn{padding:9px 20px;border-radius:8px;border:none;font-weight:700;font-size:13px;transition:all .15s;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;gap:7px;}
+.btn:hover{opacity:.9;transform:translateY(-1px);}
+.btn:active{transform:translateY(0);}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+.btn-navy{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy);}
+.btn-green{background:linear-gradient(135deg,var(--green),#047857);color:#fff;}
+.btn-danger{background:linear-gradient(135deg,var(--red),#B91C1C);color:#fff;}
+.btn-ghost{background:transparent;color:var(--blue2);border:1.5px solid var(--blue2);}
+.btn-muted{background:var(--bg2);color:var(--text);border:1px solid var(--border);}
+.btn-sm{padding:6px 13px;font-size:12px;}
+.btn-full{width:100%;}
+.field{margin-bottom:14px;}
+.field-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:5px;}
+.req{color:var(--red);}
+.inp{width:100%;background:var(--bg2);color:var(--text);border:1.5px solid var(--border);padding:9px 12px;border-radius:8px;transition:border-color .15s;}
+.inp:focus{border-color:var(--blue2);background:var(--bgcard);}
+textarea.inp{resize:vertical;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;}
+.badge-sm{padding:2px 8px;font-size:11px;}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;}
+.tbl th{text-align:left;padding:9px 12px;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:1px;border-bottom:2px solid var(--border);white-space:nowrap;font-weight:700;}
+.tbl td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.tbl tr:hover td{background:var(--bg2);}
+.modal-backdrop{position:fixed;inset:0;background:rgba(10,22,40,.65);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:1000;}
+.modal-box{background:var(--bgcard);border:1px solid var(--border);border-radius:14px;padding:28px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(10,22,40,.3);}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;}
+.modal-title{font-size:18px;font-weight:800;color:var(--navy);}
+.modal-close{background:none;border:none;color:var(--muted);font-size:24px;cursor:pointer;}
+.toast{position:fixed;bottom:22px;right:22px;padding:13px 22px;border-radius:10px;font-weight:700;font-size:13px;z-index:2000;box-shadow:0 6px 24px rgba(0,0,0,.2);pointer-events:none;color:#fff;display:none;}
+.cargo-card{border:2px solid var(--border);background:var(--bg2);border-radius:10px;padding:12px 8px;cursor:pointer;text-align:center;transition:all .15s;}
+.cargo-card:hover{border-color:var(--blue2);}
+.cargo-card.selected{border-color:var(--gold);background:linear-gradient(135deg,#FFFBF0,#FFF5D6);box-shadow:0 2px 10px rgba(201,149,42,.2);}
+.cargo-card.selected .cargo-label{color:var(--gold);}
+.cargo-label{font-size:12px;font-weight:700;margin-top:5px;color:var(--text);}
+.cargo-icon{font-size:24px;}
+.stitle{font-size:22px;font-weight:800;color:var(--navy);margin-bottom:5px;}
+.ssub{color:var(--muted);font-size:13px;margin-bottom:22px;}
+.gold-bar{height:3px;width:48px;background:linear-gradient(90deg,var(--gold),var(--gold2));border-radius:3px;margin-bottom:16px;}
+.svc-card{border:2px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px;}
+.svc-card.best{border-color:var(--gold);background:#FFFBF0;}
+.pill-tab{padding:7px 16px;border-radius:20px;border:1.5px solid var(--border);background:var(--bgcard);font-size:13px;font-weight:600;cursor:pointer;color:var(--muted);}
+.pill-tab.active-pill{background:linear-gradient(135deg,var(--navy),var(--blue2));color:#fff;border-color:transparent;}
+.auth-tabs{display:flex;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:3px;margin-bottom:20px;}
+.auth-tab{flex:1;padding:8px 0;border-radius:6px;border:none;font-weight:700;font-size:13px;cursor:pointer;background:transparent;color:var(--muted);}
+/* HOME */
+.home-page{min-height:100vh;background:linear-gradient(160deg,#0A1628 0%,#0D1F3C 50%,#0B2547 100%);}
+.home-nav{display:flex;align-items:center;justify-content:space-between;padding:18px 48px;border-bottom:1px solid rgba(255,255,255,.08);background:rgba(10,22,40,.8);backdrop-filter:blur(12px);position:sticky;top:0;z-index:50;}
+.home-hero{padding:60px 48px;display:flex;align-items:center;justify-content:space-between;gap:48px;min-height:calc(100vh - 70px);}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(201,149,42,.15);border:1px solid rgba(201,149,42,.3);border-radius:30px;padding:6px 16px;font-size:12px;font-weight:700;color:var(--gold2);letter-spacing:1px;text-transform:uppercase;margin-bottom:28px;}
+.hero-title{font-size:52px;font-weight:800;color:#fff;line-height:1.08;margin-bottom:14px;}
+.hero-gold{color:var(--gold2);}
+.hero-sub{font-size:15px;color:rgba(255,255,255,.6);line-height:1.7;margin-bottom:36px;max-width:480px;}
+.hero-cards{display:flex;gap:16px;flex-wrap:wrap;}
+.portal-card{background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.12);border-radius:14px;padding:28px;text-align:center;cursor:pointer;width:210px;transition:all .22s;backdrop-filter:blur(10px);}
+.portal-card:hover{transform:translateY(-5px);background:rgba(255,255,255,.1);box-shadow:0 12px 40px rgba(0,0,0,.3);}
+.portal-icon{width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 14px;}
+.portal-title{font-weight:800;font-size:15px;color:#fff;margin-bottom:8px;}
+.portal-sub{font-size:11px;color:rgba(255,255,255,.5);margin-bottom:16px;line-height:1.5;}
+.hero-right{flex-shrink:0;width:380px;}
+.hero-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.hstat{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:18px;text-align:center;}
+.hstat-num{font-size:28px;font-weight:800;color:var(--gold2);font-family:'JetBrains Mono',monospace;}
+.hstat-label{font-size:11px;color:rgba(255,255,255,.5);margin-top:4px;font-weight:600;}
+.hero-services{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:18px;}
+.svc-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);}
+.svc-item:last-child{border-bottom:none;padding-bottom:0;}
+.svc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.svc-name{font-size:13px;color:rgba(255,255,255,.7);font-weight:600;}
+.svc-days{margin-left:auto;font-size:11px;font-weight:700;color:var(--gold2);background:rgba(201,149,42,.15);border-radius:20px;padding:2px 10px;}
+.stat-card{border-radius:12px;padding:20px;color:#fff;text-align:center;}
+.stat-num{font-family:'JetBrains Mono',monospace;font-size:36px;font-weight:600;line-height:1;}
+.stat-label{font-size:12px;margin-top:6px;opacity:.85;font-weight:600;}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// RATE DATA — exact from WTICCL Excel files
+// ═══════════════════════════════════════════════════════
+
+// ZIP prefix → Zone (source: JFK_GARMENTS_RATES_SHEET_09-05-26)
+const ZIP_Z1 = new Set([4,5,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,280,281,282,283,284,285,286,287,288,293,295,296,297,376,403,404,405,406,410,411,412,413,414,415,416,417,418,430,431,432,433,434,435,436,437,438,439,440,441,442,443,444,445,446,447,448,449,450,451,452,453,454,455,456,457,458,459,467,468,470,473,480,481,482,483,484,485,486,487,488,489,492]);
+const ZIP_Z2 = new Set([289,290,291,292,294,298,299,300,301,302,303,304,305,306,307,308,309,310,311,312,313,314,315,316,317,318,319,320,321,322,323,324,325,326,327,328,329,330,331,332,333,334,335,336,337,338,339,340,341,342,343,344,345,346,347,349,350,351,352,353,354,355,356,357,358,359,360,361,362,363,364,365,366,367,368,369,370,371,372,373,374,375,377,378,379,380,381,382,383,384,385,386,387,388,389,390,391,392,393,394,395,396,397,398,399,400,401,402,407,408,409,420,421,422,423,424,425,426,427,460,461,462,463,464,465,466,469,471,472,474,475,476,477,478,479,490,491,493,494,495,496,497,498,499,500,501,502,503,504,505,506,507,508,509,510,511,512,513,514,515,516,520,521,522,523,524,525,526,527,528,529,530,531,532,533,534,535,536,537,538,539,540,541,542,543,544,545,546,547,548,549,550,551,552,553,554,555,556,557,558,559,560,561,562,563,564,565,566,567,568,569,570,571,572,573,574,575,576,580,581,582,583,584,585,600,601,602,603,604,605,606,607,608,609,610,611,612,613,614,615,616,617,618,619,620,621,622,623,624,625,626,627,628,629,630,631,632,633,634,635,636,637,638,639,640,641,642,643,644,645,646,647,648,649,650,651,652,653,654,655,656,657,658,659,660,661,662,663,664,665,666,667,668,669,670,671,672,673,674,675,676,680,681,682,683,684,685,686,687,688,689,691,692,700,701,702,703,704,705,706,707,708,709,710,711,712,713,714,715,716,717,718,719,720,721,722,723,724,725,726,727,728,729,730,731,732,733,734,735,736,737,738,739,740,741,742,743,744,745,746,747,748,749,750,751,752,753,754,755,756,757,758,759,760,761,762,763,764,765,766,767,768,769,770,771,772,773,774,775,776,777,778,779,780,781,782,783,784,785,786,787,788,789,790,791,792,793,794,795,796,797,798,799]);
+
+function getZone(zip) {
+  if (!zip) return 1;
+  const p = parseInt(String(zip).replace(/\D/g,'').substring(0,3)) || 0;
+  if (!p) return 1;
+  if (ZIP_Z1.has(p)) return 1;
+  if (ZIP_Z2.has(p)) return 2;
+  return 3;
+}
+
+// GARMENTS — JFK Direct, Tax Paid/DDP (source: JFK_GARMENTS_RATES_SHEET_09-05-26)
+// Index 0 = 1kg, index 23 = 24kg
+const G = {
+  z1: [11410,13770,16570,18960,21300,23740,26180,28520,30890,33300,35440,38180,40920,43660,46400,49140,51880,54620,57360,60100,62840,65580,68320,71060],
+  z2: [11764,14127,16542,19214,21883,24682,27334,29698,32073,34934,35990,38780,41570,44360,47150,49940,52730,55520,58310,61100,63890,66680,69470,72260],
+  z3: [11764,14557,17113,20289,23283,26489,29209,31573,34023,37020,37990,39380,42220,45060,47900,50740,53580,56420,59260,62100,64940,67780,70620,73460],
+};
+const GB = {
+  z1: [{lo:25,hi:29,r:2940},{lo:30,hi:40,r:2790},{lo:41,hi:99999,r:2640}],
+  z2: [{lo:25,hi:29,r:2990},{lo:30,hi:40,r:2840},{lo:41,hi:99999,r:2690}],
+  z3: [{lo:25,hi:29,r:3040},{lo:30,hi:40,r:2890},{lo:41,hi:99999,r:2790}],
+};
+
+function garmRate(zip, kg) {
+  const w = parseFloat(kg)||0;
+  if (w <= 0) return null;
+  const z = getZone(zip);
+  const zk = 'z'+z;
+  let price = 0;
+  if (w >= 1 && w <= 24) {
+    price = G[zk][Math.min(Math.round(w),24)-1] || 0;
+  } else if (w > 24) {
+    const wc = Math.ceil(w);
+    const b = GB[zk].find(b => wc >= b.lo && wc <= b.hi);
+    if (b) price = wc * b.r;
+  }
+  if (!price) return null;
+  return { name:'JFK Direct Garments — Tax Paid / DDP', type:'Tax Paid (DDP)', price:Math.round(price), transit:'8–10 W-Days', zone:'Zone '+z };
+}
+
+// PRINTING — multiple services (source: Printing_Material_US_CANADA_Calculator)
+// JFK Direct Flight rates per zone (1–19 kg fixed, 20+ kg bracket)
+const PJ = {
+  z1:[11220,13390,16000,18200,20350,22600,24850,27000,29180,31400,33350,35900,38450,41000,43550,46100,48650,51200,53750],
+  z2:[11574,13747,15972,18454,20933,23542,26004,28178,30363,33034,33900,36500,39100,41700,44300,46900,49500,52100,54700],
+  z3:[11574,14177,16543,19529,22333,25349,27879,30053,32313,35120,35900,37100,39750,42400,45050,47700,50350,53000,55650],
+};
+const PJB = {
+  z1:[{lo:20,hi:24,r:2650},{lo:25,hi:49,r:2450},{lo:50,hi:69,r:2250},{lo:70,hi:99999,r:2200}],
+  z2:[{lo:20,hi:24,r:2750},{lo:25,hi:49,r:2550},{lo:50,hi:69,r:2300},{lo:70,hi:99999,r:2250}],
+  z3:[{lo:20,hi:24,r:2800},{lo:25,hi:49,r:2600},{lo:50,hi:69,r:2350},{lo:70,hi:99999,r:2300}],
+};
+// Via UK UPS Expedite
+const UE_US=[11900,13500,15000,16600,18100,19600,21400,23900,26400,28900,31400,33900,36400,38900,41500,44000,46500,48900,51400,53500];
+const UE_CA=[13200,15000,16700,18400,20100,21800,23800,26500,29300,32100,34900,37600,40400,43200,46100,48800,51600,54300,57100,59400];
+const UEB_US=[{lo:21,hi:30,r:2600},{lo:31,hi:40,r:2500},{lo:41,hi:60,r:2500},{lo:61,hi:70,r:2500},{lo:71,hi:100,r:2400},{lo:101,hi:99999,r:2300}];
+const UEB_CA=[{lo:21,hi:30,r:2900},{lo:31,hi:40,r:2800},{lo:41,hi:60,r:2800},{lo:61,hi:70,r:2800},{lo:71,hi:100,r:2700},{lo:101,hi:99999,r:2600}];
+// Via UK UPS Saver
+const US_US=[13100,14600,16200,17700,19300,20800,25100,27500,30500,33200,36000,38800,41700,44500,47300,50000,52800,55800,58600,57700];
+const US_CA=[14500,16200,18000,19600,21400,23100,27900,30500,33900,36900,40000,43100,46300,49400,52500,55500,58600,61900,65000,64000];
+const USB_US=[{lo:21,hi:30,r:2950},{lo:31,hi:40,r:2880},{lo:41,hi:50,r:2750},{lo:51,hi:60,r:2650},{lo:61,hi:70,r:2600},{lo:71,hi:100,r:2500},{lo:101,hi:99999,r:2450}];
+const USB_CA=[{lo:21,hi:30,r:3300},{lo:31,hi:40,r:3200},{lo:41,hi:50,r:3100},{lo:51,hi:60,r:2900},{lo:61,hi:70,r:2900},{lo:71,hi:100,r:2800},{lo:101,hi:99999,r:2700}];
+// Via UK DHL
+const UD_US=[15200,18100,21000,24000,26800,29800,32600,35200,37900,40800,43300,46300,48400,51000,53000,55900,58800,62000,64100,65600];
+const UD_CA=[17800,21200,24600,28100,31300,34800,38100,41100,44400,47800,50600,54200,56600,59700,62000,65400,68800,72500,75000,76700];
+const UDB_US=[{lo:21,hi:30,r:3200},{lo:31,hi:40,r:3000},{lo:41,hi:60,r:2900},{lo:61,hi:70,r:2900},{lo:71,hi:100,r:2800},{lo:101,hi:99999,r:2800}];
+const UDB_CA=[{lo:21,hi:30,r:3700},{lo:31,hi:40,r:3400},{lo:41,hi:60,r:3300},{lo:61,hi:70,r:3300},{lo:71,hi:100,r:3300},{lo:101,hi:99999,r:3300}];
+// Direct DHL (USA only)
+const DD=[24875,31221,36593,42083,47067,49661,55893,59315,64048,68780,71456,73733,76009,78286,80563,83154,85900,87708,89984,92261];
+const DDB=[{lo:21,hi:25,r:4630},{lo:26,hi:40,r:3550},{lo:41,hi:60,r:3300},{lo:61,hi:99999,r:3200}];
+
+function lookupFixed(tbl, brackets, w) {
+  const wc = Math.ceil(w);
+  if (w >= 1 && w <= tbl.length) return tbl[Math.round(w)-1]||0;
+  const b = brackets.find(b => wc >= b.lo && wc <= b.hi);
+  return b ? wc * b.r : 0;
+}
+
+function printRate(zip, country, kg) {
+  const w = parseFloat(kg)||0;
+  if (w <= 0) return [];
+  const isCA = (country||'').toUpperCase().includes('CANADA');
+  const z = isCA ? 1 : getZone(zip);
+  const zk = 'z'+z;
+  const res = [];
+
+  // JFK Direct — USA only, zone-based
+  if (!isCA) {
+    const p = lookupFixed(PJ[zk], PJB[zk], w);
+    if (p) res.push({name:'JFK Direct Flight',type:'Tax Paid',price:Math.round(p),transit:'8–12 W-Days',zone:'Zone '+z,fastest:false});
+  }
+  // Via UK UPS Expedite
+  {
+    const tbl = isCA ? UE_CA : UE_US;
+    const brk = isCA ? UEB_CA : UEB_US;
+    const p = lookupFixed(tbl, brk, w);
+    if (p) res.push({name:'Via UK – UPS Expedite',type:'Non-Tax Paid',price:Math.round(p),transit:'8–12 W-Days',zone:'',fastest:false});
+  }
+  // Via UK UPS Saver
+  {
+    const tbl = isCA ? US_CA : US_US;
+    const brk = isCA ? USB_CA : USB_US;
+    const p = lookupFixed(tbl, brk, w);
+    if (p) res.push({name:'Via UK – UPS Saver',type:'Non-Tax Paid',price:Math.round(p),transit:'7–8 W-Days',zone:'',fastest:false});
+  }
+  // Via UK DHL
+  {
+    const tbl = isCA ? UD_CA : UD_US;
+    const brk = isCA ? UDB_CA : UDB_US;
+    const p = lookupFixed(tbl, brk, w);
+    if (p) res.push({name:'Via UK – DHL',type:'Non-Tax Paid',price:Math.round(p),transit:'6–7 W-Days',zone:'',fastest:false});
+  }
+  // Direct DHL — USA only
+  if (!isCA) {
+    const p = lookupFixed(DD, DDB, w);
+    if (p) res.push({name:'Direct DHL',type:'Tax Paid',price:Math.round(p),transit:'4–6 W-Days',zone:'',fastest:true});
+  }
+  return res.sort((a,b)=>a.price-b.price);
+}
+
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+const ADMIN_EMAIL = 'admin@wticcl.com';
+const ADMIN_PASS  = 'admin123';
+
+let S = {
+  portal:'home', user:null, users:[], pickups:[], shipments:[],
+  custPage:'calculator', adminPage:'dashboard',
+  apiConn:{dhl:true,fedex:true,ups:false,iata:false},
+  calcState:null, pickupState:null, bookState:null,
+  trackState:null,
+  adminShipFilter:'', adminPkFilter:'', adminRateTab:'printing',
+};
+
+function ss(patch){ Object.assign(S, typeof patch==='function'?patch(S):patch); render(); }
+
+// ═══════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════
+const uid  = () => Math.random().toString(36).substr(2,9).toUpperCase();
+const tkn  = () => 'PKP-'+uid();
+const trid = () => 'WTICCL-'+Date.now().toString(36).toUpperCase();
+const today= () => new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+const esc  = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const pkr  = n => '&#8360; '+Number(Math.round(n)||0).toLocaleString('en-PK');
+
+function toast(msg, color='#059669') {
+  const el = document.getElementById('toast');
+  if (!el) return;
+  el.innerHTML = msg; el.style.background = color; el.style.display='block';
+  clearTimeout(el._t); el._t = setTimeout(()=>el.style.display='none', 3500);
+}
+
+function badge(txt,color,bg,sm) {
+  return `<span class="badge${sm?' badge-sm':''}" style="background:${bg||color+'18'};color:${color};border:1.5px solid ${color}33">${esc(txt)}</span>`;
+}
+function statusColors(s) {
+  if (!s) return ['#5A6480','#EEF1F8'];
+  if (s.includes('Delivered')||s==='Delivered') return ['#059669','#ECFDF5'];
+  if (s.includes('Out for')||s==='In Transit') return ['#1B4FBF','#EFF6FF'];
+  if (s==='Processing'||s==='Scheduled') return ['#D97706','#FFFBEB'];
+  if (s==='Cancelled') return ['#DC2626','#FEF2F2'];
+  return ['#5A6480','#EEF1F8'];
+}
+function sbadge(s,sm){ const[c,bg]=statusColors(s); return badge(s,c,bg,sm); }
+
+function modal(html) {
+  closeModal();
+  const bd = document.createElement('div');
+  bd.className='modal-backdrop fade'; bd.id='modal-bd';
+  bd.innerHTML = `<div class="modal-box">${html}</div>`;
+  bd.addEventListener('click', e=>{ if(e.target===bd) closeModal(); });
+  document.body.appendChild(bd);
+}
+function closeModal() { const m=document.getElementById('modal-bd'); if(m) m.remove(); }
+
+function countryDDL(id, val) {
+  const cs=['USA','Canada','Pakistan','Afghanistan','Albania','Algeria','Argentina','Armenia','Australia','Austria','Azerbaijan','Bahrain','Bangladesh','Belgium','Brazil','Bulgaria','Cambodia','Canada','Chile','China','Colombia','Croatia','Cuba','Cyprus','Czech Republic','Denmark','Egypt','Estonia','Ethiopia','Finland','France','Georgia','Germany','Ghana','Greece','Hungary','Iceland','India','Indonesia','Iran','Iraq','Ireland','Israel','Italy','Jamaica','Japan','Jordan','Kazakhstan','Kenya','Kuwait','Latvia','Lebanon','Lithuania','Luxembourg','Malaysia','Maldives','Mexico','Morocco','Myanmar','Nepal','Netherlands','New Zealand','Nigeria','Norway','Oman','Pakistan','Peru','Philippines','Poland','Portugal','Qatar','Romania','Russia','Saudi Arabia','Serbia','Singapore','Slovakia','Slovenia','South Africa','South Korea','Spain','Sri Lanka','Sudan','Sweden','Switzerland','Syria','Taiwan','Tanzania','Thailand','Tunisia','Turkey','Uganda','Ukraine','United Arab Emirates','United Kingdom','United States','Uruguay','Uzbekistan','Venezuela','Vietnam','Yemen','Zimbabwe'];
+  return `<select id="${id}" class="inp">${cs.map(c=>`<option value="${esc(c)}"${c===val?' selected':''}>${esc(c)}</option>`).join('')}</select>`;
+}
+
+function cargoCards(sel, prefix) {
+  return [
+    {k:'printing',icon:'🖨️',label:'Printing Material',desc:'Brochures, books, banners'},
+    {k:'garments',icon:'👗',label:'Garments',desc:'Clothing, textiles, apparel'},
+    {k:'others',  icon:'📦',label:'Others',  desc:'General cargo, electronics'},
+  ].map(ct=>`
+    <div class="cargo-card${sel===ct.k?' selected':''}" data-cargo="${ct.k}" data-prefix="${prefix}">
+      <div class="cargo-icon">${ct.icon}</div>
+      <div class="cargo-label">${ct.label}</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:2px;">${ct.desc}</div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════
+function render() {
+  const root = document.getElementById('root');
+  if (!root) return;
+  const p = S.portal;
+  if      (p==='home')        root.innerHTML = renderHome();
+  else if (p==='auth-cust')   root.innerHTML = renderAuthCust();
+  else if (p==='auth-admin')  root.innerHTML = renderAuthAdmin();
+  else if (p==='customer')    root.innerHTML = renderCustShell();
+  else if (p==='admin')       root.innerHTML = renderAdminShell();
+  attachEvents();
+}
+
+// ═══════════════════════════════════════════════════════
+// HOME
+// ═══════════════════════════════════════════════════════
+function renderHome() {
+  return `
+  <div class="home-page">
+    <nav class="home-nav">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="width:40px;height:40px;background:linear-gradient(135deg,var(--gold),var(--gold2));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:20px;">✈</div>
+        <div><div style="font-weight:800;font-size:18px;color:#fff;">WTICCL</div><div style="font-size:9px;color:rgba(201,149,42,.8);text-transform:uppercase;letter-spacing:2px;font-weight:600;">Logistics</div></div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-muted btn-sm" data-action="goto-auth-cust" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;">Customer Login</button>
+        <button class="btn btn-gold btn-sm" data-action="goto-auth-admin">Admin Panel</button>
+      </div>
+    </nav>
+    <div class="home-hero">
+      <div class="fade">
+        <div class="hero-badge">✈ &nbsp;JFK · DHL · UPS · IATA</div>
+        <h1 class="hero-title">Global Cargo<br><span class="hero-gold">Forwarding</span><br>Made Simple</h1>
+        <p class="hero-sub">WTICCL delivers printing materials, garments and general cargo from Pakistan to USA, Canada and worldwide — with real-time PKR rates.</p>
+        <div class="hero-cards">
+          <div class="portal-card" data-action="goto-auth-cust">
+            <div class="portal-icon" style="background:linear-gradient(135deg,var(--blue),var(--blue2));">👤</div>
+            <div class="portal-title">Customer Portal</div>
+            <div class="portal-sub">Calculate rates, book shipments & track parcels</div>
+            <button class="btn btn-navy btn-sm btn-full">Sign In / Register</button>
+          </div>
+          <div class="portal-card" data-action="goto-auth-admin">
+            <div class="portal-icon" style="background:linear-gradient(135deg,var(--gold),var(--gold2));">🛡</div>
+            <div class="portal-title">Admin Panel</div>
+            <div class="portal-sub">Manage rates, shipments, customers & APIs</div>
+            <button class="btn btn-gold btn-sm btn-full">Admin Login</button>
+          </div>
+        </div>
+        <div style="margin-top:28px;color:rgba(255,255,255,.3);font-size:12px;">
+          Admin: <span class="mono" style="color:rgba(201,149,42,.7);">admin@wticcl.com / admin123</span>
+          &nbsp;·&nbsp; Customer demo: any email + password <span class="mono" style="color:#93C5FD;">demo</span>
+        </div>
+      </div>
+      <div class="fade">
+        <div class="hero-stats">
+          <div class="hstat"><div class="hstat-num">190+</div><div class="hstat-label">Countries Served</div></div>
+          <div class="hstat"><div class="hstat-num">3</div><div class="hstat-label">Cargo Types</div></div>
+          <div class="hstat"><div class="hstat-num">5</div><div class="hstat-label">Service Options</div></div>
+          <div class="hstat"><div class="hstat-num">PKR</div><div class="hstat-label">Local Currency</div></div>
+        </div>
+        <div class="hero-services">
+          <div style="font-size:10px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:1.5px;font-weight:700;margin-bottom:12px;">Available Services</div>
+          ${[
+            {name:'JFK Direct Flight',sub:'USA – Zone 1/2/3',color:'#C9952A',days:'8–12 Days'},
+            {name:'Via UK – UPS Expedite',sub:'USA & Canada',color:'#1B4FBF',days:'8–12 Days'},
+            {name:'Via UK – UPS Saver',sub:'USA & Canada',color:'#2563EB',days:'7–8 Days'},
+            {name:'Via UK – DHL',sub:'USA & Canada',color:'#0D9488',days:'6–7 Days'},
+            {name:'Direct DHL',sub:'USA only – Fastest',color:'#D97706',days:'4–6 Days'},
+          ].map(s=>`
+          <div class="svc-item">
+            <div class="svc-dot" style="background:${s.color};"></div>
+            <div><div class="svc-name">${s.name}</div><div style="font-size:10px;color:rgba(255,255,255,.35);">${s.sub}</div></div>
+            <div class="svc-days">${s.days}</div>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════════════
+function renderAuthCust() {
+  return `
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(160deg,var(--navy),#0B2547);">
+    <div class="fade" style="width:100%;max-width:440px;">
+      <div style="text-align:center;margin-bottom:24px;">
+        <div style="width:58px;height:58px;background:linear-gradient(135deg,var(--gold),var(--gold2));border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 14px;">✈</div>
+        <h1 style="font-size:26px;font-weight:800;color:#fff;">WTICCL</h1>
+        <p style="color:rgba(255,255,255,.45);font-size:12px;margin-top:5px;text-transform:uppercase;letter-spacing:2px;font-weight:600;">Customer Portal</p>
+      </div>
+      <div class="card">
+        <div class="auth-tabs">
+          <button class="auth-tab" id="tab-login" style="background:linear-gradient(135deg,var(--navy),var(--blue2));color:#fff;">Sign In</button>
+          <button class="auth-tab" id="tab-reg">Create Account</button>
+        </div>
+        <div id="auth-area">${loginForm()}</div>
+      </div>
+      <div style="text-align:center;margin-top:14px;">
+        <button class="btn btn-muted btn-sm" data-action="goto-home" style="color:rgba(255,255,255,.5);background:transparent;border-color:rgba(255,255,255,.15);">← Back</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function loginForm() {
+  return `
+  <div class="field"><div class="field-label">Email <span class="req">*</span></div><input id="l-email" class="inp" type="email" placeholder="you@email.com"></div>
+  <div class="field"><div class="field-label">Password <span class="req">*</span></div><input id="l-pass" class="inp" type="password" placeholder="••••••••"></div>
+  <div id="auth-err" style="color:var(--red);font-size:12px;font-weight:600;margin-bottom:10px;display:none;"></div>
+  <button class="btn btn-navy btn-full" data-action="do-login">Sign In</button>
+  <p style="color:var(--muted);font-size:12px;text-align:center;margin-top:12px;">Demo: any email + password <strong>demo</strong></p>`;
+}
+
+function regForm() {
+  return `
+  <div class="g2">
+    <div class="field"><div class="field-label">Full Name <span class="req">*</span></div><input id="r-name" class="inp" placeholder="Full name"></div>
+    <div class="field"><div class="field-label">Company</div><input id="r-company" class="inp" placeholder="Company"></div>
+  </div>
+  <div class="field"><div class="field-label">Phone</div><input id="r-phone" class="inp" placeholder="+92 300 0000000"></div>
+  <div class="field"><div class="field-label">Email <span class="req">*</span></div><input id="r-email" class="inp" type="email" placeholder="you@email.com"></div>
+  <div class="field"><div class="field-label">Password <span class="req">*</span></div><input id="r-pass" class="inp" type="password" placeholder="••••••••"></div>
+  <div id="auth-err" style="color:var(--red);font-size:12px;font-weight:600;margin-bottom:10px;display:none;"></div>
+  <button class="btn btn-navy btn-full" data-action="do-register">Create Account</button>`;
+}
+
+function renderAuthAdmin() {
+  return `
+  <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(160deg,var(--navy),#0B2547);">
+    <div class="fade" style="width:100%;max-width:380px;">
+      <div style="text-align:center;margin-bottom:24px;">
+        <div style="width:58px;height:58px;background:linear-gradient(135deg,var(--gold),var(--gold2));border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 14px;">🛡</div>
+        <h1 style="font-size:22px;font-weight:800;color:#fff;">Admin Login</h1>
+      </div>
+      <div class="card">
+        <div class="field"><div class="field-label">Email</div><input id="a-email" class="inp" type="email" value="admin@wticcl.com"></div>
+        <div class="field"><div class="field-label">Password</div><input id="a-pass" class="inp" type="password" placeholder="admin123"></div>
+        <div id="auth-err" style="color:var(--red);font-size:12px;font-weight:600;margin-bottom:10px;display:none;"></div>
+        <button class="btn btn-gold btn-full" data-action="do-admin-login">Sign In to Admin</button>
+        <p style="color:var(--muted);font-size:12px;text-align:center;margin-top:12px;">Demo password: <strong>admin123</strong></p>
+      </div>
+      <div style="text-align:center;margin-top:14px;">
+        <button class="btn btn-muted btn-sm" data-action="goto-home" style="color:rgba(255,255,255,.5);background:transparent;border-color:rgba(255,255,255,.15);">← Back</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// CUSTOMER SHELL
+// ═══════════════════════════════════════════════════════
+const CNAV=[{k:'calculator',l:'Rate Calculator',i:'🧮'},{k:'pickup',l:'Schedule Pickup',i:'📍'},{k:'book',l:'Book Shipment',i:'📦'},{k:'tracking',l:'Track Shipment',i:'🔍'}];
+
+function renderCustShell() {
+  const u = S.user;
+  const nav = CNAV.map(n=>`<button class="nav-btn${S.custPage===n.k?' active':''}" data-cpage="${n.k}"><span style="width:18px;text-align:center;">${n.i}</span>${esc(n.l)}</button>`).join('');
+  let content = '';
+  if (S.custPage==='calculator') content = renderCalc();
+  else if (S.custPage==='pickup')   content = renderPickup();
+  else if (S.custPage==='book')     content = renderBook();
+  else if (S.custPage==='tracking') content = renderTracking();
+  return `
+  <div class="app">
+    <div class="sidebar">
+      <div class="sidebar-logo"><div class="logo-wrap"><div class="logo-icon">✈</div><div><div class="logo-name">WTICCL</div><div class="logo-tag">Customer Portal</div></div></div></div>
+      <div class="sidebar-nav">${nav}</div>
+      <div class="sidebar-footer">
+        <div style="font-size:12px;font-weight:700;color:#fff;margin-bottom:2px;">${esc(u.name)}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.35);margin-bottom:12px;">${esc(u.email)}</div>
+        <button class="btn btn-sm btn-full" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.7);" data-action="logout">Sign Out</button>
+      </div>
+    </div>
+    <div class="main fade">${content}</div>
+  </div>`;
+}
+
+// ── CALCULATOR ──────────────────────────────────────
+function renderCalc() {
+  if (!S.calcState) S.calcState={cargo:'printing',country:'USA',zip:'',weight:'',results:null};
+  const c = S.calcState;
+  const isGarm = c.cargo==='garments';
+  const res = c.results;
+
+  let resultsHtml = '';
+  if (res === null) {
+    resultsHtml = `<div class="card" style="text-align:center;padding:48px 24px;">
+      <div style="font-size:54px;margin-bottom:14px;">🌍</div>
+      <div style="font-size:15px;font-weight:700;color:var(--navy);">Select cargo type, fill the form and calculate</div>
+      <div style="color:var(--muted);font-size:13px;margin-top:8px;">Rates come directly from WTICCL Excel sheets</div>
+    </div>`;
+  } else if (res === 'others') {
+    resultsHtml = `<div class="card" style="text-align:center;padding:40px;border:2px solid var(--gold);">
+      <div style="font-size:48px;margin-bottom:14px;">📦</div>
+      <div style="font-size:16px;font-weight:800;color:var(--navy);margin-bottom:8px;">General Cargo — Custom Quote</div>
+      <div style="color:var(--muted);font-size:13px;line-height:1.7;">For general cargo, rates depend on dimensions, commodity and destination.<br><strong>Contact WTICCL sales for a tailored PKR quote.</strong></div>
+    </div>`;
+  } else if (Array.isArray(res) && res.length === 0) {
+    resultsHtml = `<div class="card" style="text-align:center;padding:40px;">
+      <div style="font-size:48px;margin-bottom:12px;">⚠️</div>
+      <div style="font-size:14px;font-weight:700;color:var(--navy);">No rates found</div>
+      <div style="color:var(--muted);font-size:13px;margin-top:8px;line-height:1.6;">
+        ${isGarm ? 'Garments: enter a valid US ZIP code and weight 1–41+ kg.' : 'Check country, ZIP code and weight. Printing covers USA (all zones) and Canada.'}
+      </div>
+    </div>`;
+  } else if (Array.isArray(res) && res.length > 0) {
+    const best = res[0];
+    resultsHtml = `
+    <div style="background:linear-gradient(135deg,var(--navy),var(--navy2));border-radius:12px;padding:20px;margin-bottom:14px;color:#fff;">
+      <div style="font-size:11px;color:var(--gold2);text-transform:uppercase;letter-spacing:1.5px;font-weight:700;margin-bottom:6px;">${isGarm?'Garments JFK Rate':'Best Rate Available'}</div>
+      <div class="mono" style="font-size:40px;font-weight:700;color:var(--gold2);">${pkr(best.price)}</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:4px;">via ${esc(best.name)} · ${esc(best.transit)}${best.zone?' · '+esc(best.zone):''}</div>
+    </div>
+    ${res.map((r,i)=>`
+    <div class="svc-card${i===0?' best':''}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+        <div>
+          <div style="font-weight:800;font-size:14px;color:var(--navy);">${esc(r.name)} ${r.fastest?'<span style="background:#FEF3C7;color:#B45309;font-size:10px;padding:2px 7px;border-radius:10px;margin-left:6px;">FASTEST</span>':''}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">${esc(r.type)} · ${esc(r.transit)}${r.zone?' · '+esc(r.zone):''}</div>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--gold);flex-shrink:0;">${pkr(r.price)}</div>
+      </div>
+      ${i===0&&res.length>1?`<div style="font-size:11px;color:var(--gold);margin-top:6px;font-weight:700;">✓ Best price — saving ${pkr(res[res.length-1].price - r.price)} vs most expensive</div>`:''}
+    </div>`).join('')}`;
+  }
+
+  return `
+  <div>
+    <div class="gold-bar"></div>
+    <div class="stitle">Rate Calculator</div>
+    <div class="ssub">Instant PKR rates from WTICCL Excel sheets</div>
+    <div class="g2" style="align-items:start;gap:22px;">
+      <div class="card">
+        <div class="field">
+          <div class="field-label">Cargo Type <span class="req">*</span></div>
+          <div class="g3">${cargoCards(c.cargo,'calc')}</div>
+        </div>
+        ${isGarm?`<div style="background:#FFFBEB;border:1.5px solid #D97706;border-radius:8px;padding:10px 13px;margin-bottom:14px;font-size:12px;color:#92400E;font-weight:600;">✈ Garments: JFK Direct, USA only — Tax Paid/DDP. Zone determined by ZIP code.</div>`:''}
+        <div class="g2">
+          <div class="field"><div class="field-label">Country <span class="req">*</span></div>${countryDDL('calc-country',c.country)}</div>
+          <div class="field"><div class="field-label">${isGarm?'US ZIP (first 3 digits)':'ZIP / Postal'} <span class="req">*</span></div>
+            <input id="calc-zip" class="inp" value="${esc(c.zip)}" placeholder="${isGarm?'e.g. 100, 350, 800':'ZIP or Postal'}">
+            ${isGarm?'<div style="font-size:10px;color:var(--muted);margin-top:3px;">Determines Zone 1 / 2 / 3</div>':''}
+          </div>
+        </div>
+        <div class="field"><div class="field-label">Weight (kg) <span class="req">*</span></div>
+          <input id="calc-weight" class="inp" type="number" min="0.5" step="0.5" value="${esc(c.weight)}" placeholder="e.g. 10">
+        </div>
+        <button class="btn btn-navy btn-full" data-action="do-calc">🧮 Calculate Rates</button>
+      </div>
+      <div>${resultsHtml}</div>
+    </div>
+  </div>`;
+}
+
+// ── PICKUP ──────────────────────────────────────────
+function renderPickup() {
+  if (!S.pickupState) S.pickupState={cargo:'printing',fromCountry:'Pakistan',name:S.user.name||'',phone:'',address:'',date:'',slot:'',packages:'1',notes:''};
+  const p = S.pickupState;
+  const mine = S.pickups.filter(x=>x.userId===S.user.email);
+  return `
+  <div>
+    <div class="gold-bar"></div>
+    <div class="stitle">Schedule Pickup</div>
+    <div class="ssub">Request a courier and receive your pickup token number</div>
+    <div class="g2" style="align-items:start;gap:22px;">
+      <div class="card">
+        <div class="field"><div class="field-label">Cargo Type</div><div class="g3">${cargoCards(p.cargo,'pk')}</div></div>
+        <div class="g2">
+          <div class="field"><div class="field-label">Name <span class="req">*</span></div><input id="pk-name" class="inp" value="${esc(p.name)}" placeholder="Full name"></div>
+          <div class="field"><div class="field-label">Phone</div><input id="pk-phone" class="inp" value="${esc(p.phone)}" placeholder="+92 300 0000000"></div>
+        </div>
+        <div class="field"><div class="field-label">Pickup Address <span class="req">*</span></div><input id="pk-addr" class="inp" value="${esc(p.address)}" placeholder="Full address"></div>
+        <div class="field"><div class="field-label">From Country</div>${countryDDL('pk-from',p.fromCountry)}</div>
+        <div class="g2">
+          <div class="field"><div class="field-label">Date <span class="req">*</span></div><input id="pk-date" class="inp" type="date" value="${esc(p.date)}"></div>
+          <div class="field"><div class="field-label">Time Slot</div>
+            <select id="pk-slot" class="inp">
+              <option value="">Any time</option>
+              ${['09:00–12:00','12:00–15:00','15:00–18:00'].map(v=>`<option${p.slot===v?' selected':''} value="${v}">${v}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+        <div class="field"><div class="field-label">No. of Packages</div><input id="pk-pkgs" class="inp" type="number" min="1" value="${esc(p.packages)}"></div>
+        <div class="field"><div class="field-label">Notes</div><textarea id="pk-notes" class="inp" rows="2" placeholder="Fragile, roll-packed, etc.">${esc(p.notes)}</textarea></div>
+        <button class="btn btn-navy btn-full" data-action="do-pickup">📍 Request Pickup</button>
+      </div>
+      <div>
+        <div id="pk-token-box" style="display:none;margin-bottom:14px;"></div>
+        <div class="card">
+          <div style="font-weight:700;color:var(--navy);margin-bottom:14px;">My Pickups</div>
+          ${mine.length===0?'<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px;">No pickups yet.</div>':mine.slice().reverse().map(x=>`
+          <div style="padding:10px 0;border-bottom:1px solid var(--border);">
+            <div style="display:flex;justify-content:space-between;">
+              <span class="mono" style="color:var(--blue);font-weight:700;font-size:13px;">${esc(x.token)}</span>
+              ${sbadge(x.status,true)}
+            </div>
+            <div style="font-size:12px;color:var(--muted);margin-top:3px;">${esc(x.date)} · ${esc(x.packages)} pkg(s) · ${esc(x.fromCountry)}</div>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── BOOK ────────────────────────────────────────────
+function renderBook() {
+  if (!S.bookState) S.bookState={cargo:'printing',from:'Pakistan',to:'USA',zip:'',sName:S.user.name||'',sAddr:'',rName:'',rAddr:'',rPhone:'',weight:'',service:'JFK Direct Flight',desc:''};
+  const b = S.bookState;
+  const mine = S.shipments.filter(x=>x.userId===S.user.email);
+  return `
+  <div>
+    <div class="gold-bar"></div>
+    <div class="stitle">Book Shipment</div>
+    <div class="ssub">Book with WTICCL and receive your tracking ID</div>
+    <div class="g2" style="align-items:start;gap:22px;">
+      <div class="card">
+        <div class="field"><div class="field-label">Cargo Type</div><div class="g3">${cargoCards(b.cargo,'bk')}</div></div>
+        <div class="g2">
+          <div class="field"><div class="field-label">From</div>${countryDDL('bk-from',b.from)}</div>
+          <div class="field"><div class="field-label">To</div>${countryDDL('bk-to',b.to)}</div>
+        </div>
+        <div class="field"><div class="field-label">Destination ZIP / Postal</div><input id="bk-zip" class="inp" value="${esc(b.zip)}" placeholder="US ZIP or Canada Postal"></div>
+        <div class="g2">
+          <div class="field"><div class="field-label">Your Name <span class="req">*</span></div><input id="bk-sname" class="inp" value="${esc(b.sName)}"></div>
+          <div class="field"><div class="field-label">Your Address</div><input id="bk-saddr" class="inp" value="${esc(b.sAddr)}" placeholder="Pickup address"></div>
+        </div>
+        <div class="g2">
+          <div class="field"><div class="field-label">Recipient Name <span class="req">*</span></div><input id="bk-rname" class="inp" value="${esc(b.rName)}"></div>
+          <div class="field"><div class="field-label">Recipient Phone</div><input id="bk-rphone" class="inp" value="${esc(b.rPhone)}"></div>
+        </div>
+        <div class="field"><div class="field-label">Recipient Address</div><input id="bk-raddr" class="inp" value="${esc(b.rAddr)}" placeholder="Full delivery address"></div>
+        <div class="g2">
+          <div class="field"><div class="field-label">Weight kg <span class="req">*</span></div><input id="bk-weight" class="inp" type="number" min="0.5" step="0.5" value="${esc(b.weight)}"></div>
+          <div class="field"><div class="field-label">Service</div>
+            <select id="bk-service" class="inp">
+              ${['JFK Direct Flight','Via UK – UPS Expedite','Via UK – UPS Saver','Via UK – DHL','Direct DHL'].map(v=>`<option${b.service===v?' selected':''}>${v}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+        <div class="field"><div class="field-label">Contents Description</div><input id="bk-desc" class="inp" value="${esc(b.desc)}" placeholder="Brochures, T-shirts, electronics..."></div>
+        <button class="btn btn-navy btn-full" data-action="do-book">📦 Book &amp; Get Tracking ID</button>
+      </div>
+      <div>
+        <div id="bk-result-box" style="display:none;margin-bottom:14px;"></div>
+        <div class="card">
+          <div style="font-weight:700;color:var(--navy);margin-bottom:14px;">My Shipments</div>
+          ${mine.length===0?'<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px;">No shipments yet.</div>':mine.slice().reverse().map(x=>`
+          <div style="padding:9px 0;border-bottom:1px solid var(--border);">
+            <div style="display:flex;justify-content:space-between;">
+              <span class="mono" style="color:var(--green);font-size:12px;font-weight:700;">${esc(x.trackId)}</span>
+              ${sbadge(x.status,true)}
+            </div>
+            <div style="font-size:12px;color:var(--muted);">${esc(x.from)} → ${esc(x.to)} · ${esc(x.weight)}kg</div>
+            <div style="font-size:12px;color:var(--gold);font-weight:700;">${pkr(x.price)}</div>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── TRACKING ────────────────────────────────────────
+const MOCK_TRACKS = {
+  dhl:  {"DHL123456789":{carrier:"DHL Express",status:"In Transit",origin:"Karachi, PK",dest:"New York, USA",events:[{t:"Jun 20 09:14",l:"JFK Customs",s:"Customs Clearance"},{t:"Jun 19 22:30",l:"Frankfurt Hub",s:"Departed Hub"},{t:"Jun 19 14:00",l:"Karachi Airport",s:"Picked Up"}]}},
+  fedex:{"FDX987654321":{carrier:"FedEx International",status:"Out for Delivery",origin:"Lahore, PK",dest:"Chicago, USA",events:[{t:"Jun 20 08:00",l:"Chicago, IL",s:"Out for Delivery"},{t:"Jun 20 05:30",l:"Chicago Facility",s:"Arrived"},{t:"Jun 19 18:00",l:"Lahore",s:"Picked Up"}]}},
+  ups:  {"UPS112233445":{carrier:"UPS Worldwide",status:"Delivered",origin:"Islamabad, PK",dest:"Seattle, USA",events:[{t:"Jun 19 14:22",l:"Seattle, WA",s:"Delivered – Front Door"},{t:"Jun 19 06:10",l:"Seattle, WA",s:"Out for Delivery"},{t:"Jun 18 21:00",l:"Portland, OR",s:"In Transit"}]}},
+  iata: {"IATA-AWB-001":{carrier:"IATA Air Cargo",status:"In Transit",origin:"Karachi (KHI)",dest:"JFK New York",events:[{t:"Jun 20 06:00",l:"JFK Airport",s:"Arrived – Awaiting Customs"},{t:"Jun 19 20:00",l:"Amsterdam (AMS)",s:"Transit Hub"},{t:"Jun 19 08:00",l:"KHI Airport",s:"Departed Origin"}]}},
+};
+
+function renderTracking() {
+  if (!S.trackState || !S.trackState.wticcl) {
+    S.trackState = {wticcl:{q:'',err:''},dhl:{q:'',err:''},fedex:{q:'',err:''},ups:{q:'',err:''},iata:{q:'',err:''}};
+  }
+  const ts = S.trackState;
+
+  const carriers = [
+    {k:'wticcl',label:'WTICCL Shipments',icon:'✈',color:'var(--navy)',sample:null},
+    {k:'dhl',   label:'DHL Express',     icon:'🟡',color:'#92400E',  sample:'DHL123456789'},
+    {k:'fedex', label:'FedEx',           icon:'🟠',color:'#B45309',  sample:'FDX987654321'},
+    {k:'ups',   label:'UPS',             icon:'🟤',color:'#C2410C',  sample:'UPS112233445'},
+    {k:'iata',  label:'IATA Air Cargo',  icon:'🛫',color:'#1D4ED8',  sample:'IATA-AWB-001'},
+  ];
+
+  function getResult(k, q) {
+    if (!q) return null;
+    const qu = q.toUpperCase().trim();
+    if (k==='wticcl') {
+      const s = S.shipments.find(x=>x.trackId===qu);
+      if (!s) return null;
+      return {carrier:'WTICCL',status:s.status,origin:s.from,dest:s.to,weight:s.weight+'kg',price:s.price,createdAt:s.createdAt,events:[{t:s.createdAt,l:s.from+' – WTICCL Hub',s:'Shipment Confirmed'},{t:'Pending',l:'Processing Centre',s:'Processing & Documentation'}]};
+    }
+    return (MOCK_TRACKS[k]||{})[qu] || null;
+  }
+
+  function tline(events, color) {
+    return (events||[]).map((ev,i)=>`
+    <div style="display:flex;gap:10px;margin-bottom:12px;">
+      <div style="display:flex;flex-direction:column;align-items:center;">
+        <div style="width:10px;height:10px;border-radius:50%;flex-shrink:0;background:${i===0?color:'var(--border2)'};border:2px solid ${i===0?color:'var(--border)'};margin-top:2px;"></div>
+        ${i<(events.length-1)?'<div style="width:2px;flex:1;background:var(--border);margin-top:4px;min-height:14px;"></div>':''}
+      </div>
+      <div>
+        <div style="font-weight:700;font-size:12px;color:${i===0?'var(--navy)':'var(--text)'};">${esc(ev.s||ev.status)}</div>
+        <div style="font-size:11px;color:var(--muted);">${esc(ev.l||ev.loc)}</div>
+        <div class="mono" style="font-size:10px;color:var(--muted);">${esc(ev.t||ev.time)}</div>
+      </div>
+    </div>`).join('');
+  }
+
+  return `
+  <div>
+    <div class="gold-bar"></div>
+    <div class="stitle">Track Shipment</div>
+    <div class="ssub">Separate search bar for each carrier — enter any ID and hit Track</div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      ${carriers.map(c=>{
+        const st = ts[c.k]||{q:'',err:''};
+        const res = getResult(c.k, st.q);
+        const[sc,sbg] = res ? statusColors(res.status) : ['',''];
+        return `
+        <div class="card" style="border-left:4px solid ${c.color};">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+            <span style="font-size:20px;">${c.icon}</span>
+            <span style="font-weight:800;font-size:15px;color:${c.color};">${c.label}</span>
+            ${c.sample?`<button class="btn btn-sm" data-action="fill-track" data-carrier="${c.k}" data-val="${c.sample}" style="background:var(--bg2);color:${c.color};border:1.5px solid ${c.color}44;margin-left:auto;font-size:11px;">Try: ${c.sample}</button>`:'<span style="margin-left:auto;font-size:11px;color:var(--muted);">Your WTICCL bookings</span>'}
+          </div>
+          <div style="display:flex;gap:10px;">
+            <input id="trk-${c.k}" class="inp" placeholder="Enter ${c.label} tracking number..." value="${esc(st.q)}" style="font-family:'JetBrains Mono',monospace;font-size:13px;">
+            <button class="btn btn-sm" data-action="do-track" data-carrier="${c.k}" style="background:${c.color};color:#fff;flex-shrink:0;padding:9px 18px;">Track</button>
+          </div>
+          ${st.err?`<div style="color:var(--red);font-size:12px;font-weight:600;margin-top:8px;">⚠ ${esc(st.err)}</div>`:''}
+          ${res?`
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;align-content:start;">
+                ${[['Carrier',res.carrier],['Status',null],['Origin',res.origin],['Destination',res.dest],res.weight?['Weight',res.weight]:null,res.price?['Cost',pkr(res.price)]:null].filter(Boolean).map(([k,v])=>`
+                <div style="background:var(--bg2);border-radius:7px;padding:9px 11px;">
+                  <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:700;">${k}</div>
+                  ${k==='Status'?`<div style="margin-top:4px;">${badge(res.status,sc,sbg,true)}</div>`:`<div style="font-weight:700;font-size:12px;margin-top:3px;color:var(--navy);">${esc(v)}</div>`}
+                </div>`).join('')}
+              </div>
+              <div>
+                <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">Timeline</div>
+                ${tline(res.events, c.color)}
+              </div>
+            </div>
+          </div>`:''}
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// ADMIN SHELL
+// ═══════════════════════════════════════════════════════
+const ANAV=[{k:'dashboard',l:'Dashboard',i:'📊'},{k:'shipments',l:'Shipments',i:'📦'},{k:'pickups',l:'Pickups',i:'📍'},{k:'customers',l:'Customers',i:'👥'},{k:'rates',l:'Rate Sheets',i:'💰'},{k:'api',l:'API Settings',i:'⚙️'}];
+
+function renderAdminShell() {
+  const nav = ANAV.map(n=>`<button class="nav-btn${S.adminPage===n.k?' active-admin':''}" data-apage="${n.k}"><span style="width:18px;text-align:center;">${n.i}</span>${esc(n.l)}</button>`).join('');
+  let content = '';
+  if (S.adminPage==='dashboard') content=renderAdminDash();
+  else if (S.adminPage==='shipments') content=renderAdminShips();
+  else if (S.adminPage==='pickups')   content=renderAdminPicks();
+  else if (S.adminPage==='customers') content=renderAdminCusts();
+  else if (S.adminPage==='rates')     content=renderAdminRates();
+  else if (S.adminPage==='api')       content=renderAdminAPI();
+  return `
+  <div class="app">
+    <div class="sidebar" style="background:linear-gradient(180deg,#0A1628,#0F0A3C);">
+      <div class="sidebar-logo"><div class="logo-wrap"><div class="logo-icon">🛡</div><div><div class="logo-name">WTICCL</div><div class="logo-tag" style="color:#93C5FD;">Admin Panel</div></div></div></div>
+      <div class="sidebar-nav">${nav}</div>
+      <div class="sidebar-footer">
+        <div style="font-size:11px;color:var(--gold3);font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;">Administrator</div>
+        <button class="btn btn-sm btn-full" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.7);" data-action="logout">Sign Out</button>
+      </div>
+    </div>
+    <div class="main fade">${content}</div>
+  </div>`;
+}
+
+function renderAdminDash() {
+  const stats=[
+    {l:'Customers',v:S.users.length,g:'linear-gradient(135deg,#0A1628,#1B4FBF)',i:'👥'},
+    {l:'Shipments',v:S.shipments.length,g:'linear-gradient(135deg,#0D9488,#065F46)',i:'📦'},
+    {l:'Active Pickups',v:S.pickups.filter(p=>p.status==='Scheduled').length,g:'linear-gradient(135deg,#C9952A,#92400E)',i:'📍'},
+    {l:'Delivered',v:S.shipments.filter(s=>s.status==='Delivered').length,g:'linear-gradient(135deg,#059669,#065F46)',i:'✅'},
+  ];
+  return `
+  <div>
+    <div class="gold-bar"></div>
+    <div class="stitle">Dashboard</div>
+    <div class="ssub">WTICCL platform overview</div>
+    <div class="g4" style="margin-bottom:22px;">
+      ${stats.map(s=>`<div class="stat-card" style="background:${s.g};"><div style="font-size:26px;margin-bottom:8px;">${s.i}</div><div class="stat-num">${s.v}</div><div class="stat-label">${s.l}</div></div>`).join('')}
+    </div>
+    <div class="g2">
+      <div class="card">
+        <div style="font-weight:700;color:var(--navy);margin-bottom:14px;">Recent Shipments</div>
+        ${S.shipments.length===0?'<div style="color:var(--muted);">None yet.</div>':S.shipments.slice(-6).reverse().map(s=>`
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">
+          <div><div class="mono" style="color:var(--green);font-size:12px;font-weight:700;">${esc(s.trackId)}</div><div style="font-size:11px;color:var(--muted);">${esc(s.from)}→${esc(s.to)} · ${esc(s.weight)}kg</div></div>
+          ${sbadge(s.status,true)}
+        </div>`).join('')}
+      </div>
+      <div class="card">
+        <div style="font-weight:700;color:var(--navy);margin-bottom:14px;">Recent Pickups</div>
+        ${S.pickups.length===0?'<div style="color:var(--muted);">None yet.</div>':S.pickups.slice(-6).reverse().map(p=>`
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">
+          <div><div class="mono" style="color:var(--blue);font-size:12px;font-weight:700;">${esc(p.token)}</div><div style="font-size:11px;color:var(--muted);">${esc(p.name)} · ${esc(p.date)}</div></div>
+          ${sbadge(p.status,true)}
+        </div>`).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderAdminShips() {
+  const f=S.adminShipFilter||'';
+  const data=S.shipments.filter(s=>!f||s.trackId.includes(f.toUpperCase())||(s.rName||'').toLowerCase().includes(f.toLowerCase())||(s.to||'').toLowerCase().includes(f.toLowerCase()));
+  return `
+  <div>
+    <div class="gold-bar"></div><div class="stitle">Manage Shipments</div>
+    <div class="card">
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:14px;">
+        <input class="inp" id="ship-filter" placeholder="🔍 Search ID, name, country..." value="${esc(f)}" style="width:300px;">
+        <span style="color:var(--muted);font-size:12px;font-weight:600;margin-left:auto;">${data.length} result(s)</span>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="tbl">
+          <thead><tr><th>Tracking ID</th><th>From</th><th>To</th><th>Cargo</th><th>Weight</th><th>Service</th><th>Price</th><th>Status</th><th>Customer</th><th>Date</th><th>Actions</th></tr></thead>
+          <tbody>
+            ${data.length===0?'<tr><td colspan="11" style="text-align:center;padding:24px;color:var(--muted);">No shipments found.</td></tr>':data.map(s=>`
+            <tr>
+              <td><span class="mono" style="color:var(--green);font-size:12px;font-weight:700;">${esc(s.trackId)}</span></td>
+              <td>${esc(s.from)}</td><td>${esc(s.to)}</td><td>${esc(s.cargo)}</td>
+              <td class="mono">${esc(s.weight)}kg</td><td style="color:var(--muted);font-size:12px;">${esc(s.service)}</td>
+              <td class="mono" style="color:var(--gold);font-weight:700;">${pkr(s.price)}</td>
+              <td>${sbadge(s.status,true)}</td>
+              <td style="color:var(--muted);font-size:11px;">${esc(s.userId)}</td>
+              <td style="color:var(--muted);font-size:11px;">${esc(s.createdAt)}</td>
+              <td><div style="display:flex;gap:5px;">
+                <button class="btn btn-ghost btn-sm" data-action="edit-ship" data-idx="${S.shipments.indexOf(s)}">Edit</button>
+                <button class="btn btn-danger btn-sm" data-action="del-ship" data-idx="${S.shipments.indexOf(s)}">Del</button>
+              </div></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderAdminPicks() {
+  const f=S.adminPkFilter||'';
+  const data=S.pickups.filter(p=>!f||(p.token||'').includes(f.toUpperCase())||(p.name||'').toLowerCase().includes(f.toLowerCase()));
+  return `
+  <div>
+    <div class="gold-bar"></div><div class="stitle">Manage Pickups</div>
+    <div class="card">
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:14px;">
+        <input class="inp" id="pk-filter" placeholder="🔍 Search token, name..." value="${esc(f)}" style="width:280px;">
+        <span style="color:var(--muted);font-size:12px;font-weight:600;margin-left:auto;">${data.length} result(s)</span>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="tbl">
+          <thead><tr><th>Token</th><th>Name</th><th>Phone</th><th>Country</th><th>Cargo</th><th>Date</th><th>Pkgs</th><th>Status</th><th>Customer</th><th>Actions</th></tr></thead>
+          <tbody>
+            ${data.length===0?'<tr><td colspan="10" style="text-align:center;padding:24px;color:var(--muted);">No pickups found.</td></tr>':data.map(p=>`
+            <tr>
+              <td><span class="mono" style="color:var(--blue);font-size:12px;font-weight:700;">${esc(p.token)}</span></td>
+              <td>${esc(p.name)}</td><td style="color:var(--muted);">${esc(p.phone)}</td>
+              <td>${esc(p.fromCountry)}</td><td>${esc(p.cargo)}</td>
+              <td class="mono">${esc(p.date)}</td><td>${esc(p.packages)}</td>
+              <td>${sbadge(p.status,true)}</td>
+              <td style="color:var(--muted);font-size:11px;">${esc(p.userId)}</td>
+              <td><div style="display:flex;gap:5px;">
+                <button class="btn btn-ghost btn-sm" data-action="edit-pickup" data-tok="${esc(p.token)}">Edit</button>
+                <button class="btn btn-danger btn-sm" data-action="del-pickup" data-tok="${esc(p.token)}">Del</button>
+              </div></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderAdminCusts() {
+  return `
+  <div>
+    <div class="gold-bar"></div><div class="stitle">Customers</div>
+    <div class="card">
+      <table class="tbl">
+        <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Company</th><th>Joined</th><th>Shipments</th><th>Actions</th></tr></thead>
+        <tbody>
+          ${S.users.length===0?'<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted);">No customers yet.</td></tr>':S.users.map(u=>`
+          <tr>
+            <td style="font-weight:700;">${esc(u.name)}</td><td style="color:var(--blue2);">${esc(u.email)}</td>
+            <td style="color:var(--muted);">${esc(u.phone||'—')}</td><td style="color:var(--muted);">${esc(u.company||'—')}</td>
+            <td style="color:var(--muted);font-size:11px;">${esc(u.joinedAt||'—')}</td>
+            <td><span class="badge" style="background:#EFF6FF;color:var(--blue2);border:1px solid #BFDBFE;">${S.shipments.filter(s=>s.userId===u.email).length}</span></td>
+            <td><div style="display:flex;gap:5px;">
+              <button class="btn btn-ghost btn-sm" data-action="edit-user" data-email="${esc(u.email)}">Edit</button>
+              <button class="btn btn-danger btn-sm" data-action="del-user" data-email="${esc(u.email)}">Remove</button>
+            </div></td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+function renderAdminRates() {
+  const tab = S.adminRateTab||'printing';
+  const gRows = (zk) => G[zk].map((p,i)=>({kg:i+1,price:p})).concat(GB[zk].map(b=>({kg:`${b.lo}–${b.hi} kg`,price:b.r+'/kg'})));
+  const sections = tab==='garments' ? [
+    {name:'Zone 1 (ZIP 004–288 + extras)',rows:gRows('z1')},
+    {name:'Zone 2 (ZIP 289–799)',rows:gRows('z2')},
+    {name:'Zone 3 (ZIP 800+)',rows:gRows('z3')},
+  ] : tab==='printing' ? [
+    {name:'JFK Direct – Zone 1',rows:PJ.z1.map((p,i)=>({kg:i+1,price:p})).concat(PJB.z1.map(b=>({kg:`${b.lo}–${b.hi}kg`,price:b.r+'/kg'})))},
+    {name:'JFK Direct – Zone 2',rows:PJ.z2.map((p,i)=>({kg:i+1,price:p})).concat(PJB.z2.map(b=>({kg:`${b.lo}–${b.hi}kg`,price:b.r+'/kg'})))},
+    {name:'UPS Expedite USA',rows:UE_US.map((p,i)=>({kg:i+1,price:p})).concat(UEB_US.map(b=>({kg:`${b.lo}–${b.hi}kg`,price:b.r+'/kg'})))},
+  ] : [{name:'General Cargo',rows:[{kg:'—',price:'Contact sales for quote'}]}];
+
+  return `
+  <div>
+    <div class="gold-bar"></div>
+    <div class="stitle">Rate Sheets <span style="font-size:13px;font-weight:600;color:var(--muted);">— All prices in PKR</span></div>
+    <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;align-items:center;">
+      ${['printing','garments','others'].map(t=>`<button class="pill-tab${tab===t?' active-pill':''}" data-action="rate-tab" data-tab="${t}">${{printing:'🖨️ Printing',garments:'👗 Garments',others:'📦 Others'}[t]}</button>`).join('')}
+      <label class="btn btn-muted btn-sm" style="cursor:pointer;margin-left:auto;">📊 Import Excel<input type="file" accept=".xlsx,.csv" style="display:none;" id="rate-upload"></label>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;">
+      ${sections.map(sec=>`
+      <div class="card">
+        <div style="font-weight:800;color:var(--navy);margin-bottom:14px;font-size:14px;">${esc(sec.name)}</div>
+        <table class="tbl" style="font-size:12px;">
+          <thead><tr><th>Weight</th><th>PKR Rate</th></tr></thead>
+          <tbody>${sec.rows.slice(0,30).map(r=>`
+          <tr>
+            <td class="mono">${typeof r.kg==='number'?r.kg+' kg':r.kg}</td>
+            <td class="mono" style="color:var(--gold);font-weight:700;">${typeof r.price==='number'?pkr(r.price):r.price}</td>
+          </tr>`).join('')}</tbody>
+        </table>
+        <div style="color:var(--muted);font-size:11px;margin-top:8px;">Source: WTICCL Excel Rate Sheet</div>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function renderAdminAPI() {
+  const conn = S.apiConn||{};
+  const apis=[
+    {id:'dhl',  name:'DHL Express',  color:'#92400E',fields:['API Key','Account Number','Client Secret']},
+    {id:'fedex',name:'FedEx',        color:'#B45309',fields:['API Key','Client ID','Client Secret','Account']},
+    {id:'ups',  name:'UPS',          color:'#C2410C',fields:['API Key','Username','Password','Account']},
+    {id:'iata', name:'IATA',         color:'#1D4ED8',fields:['IATA API Key','Carrier Code','Certificate No.','Billing Account']},
+  ];
+  return `
+  <div>
+    <div class="gold-bar"></div><div class="stitle">API Settings</div>
+    <div class="ssub">Manage carrier API integrations for live tracking and rates</div>
+    <div class="g2">
+      ${apis.map(a=>`
+      <div class="card" style="border:2px solid ${conn[a.id]?a.color+'55':'var(--border)'};">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <div style="font-size:16px;font-weight:800;color:${a.color};">${a.name}</div>
+          ${badge(conn[a.id]?'Connected':'Not Connected',conn[a.id]?'#059669':'var(--muted)',conn[a.id]?'#ECFDF5':'var(--bg2)',true)}
+        </div>
+        ${a.fields.map(f=>`<div style="margin-bottom:10px;"><div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:4px;">${f}</div><input type="password" class="inp" placeholder="${conn[a.id]?'••••••••':'Enter '+f}"></div>`).join('')}
+        <div style="margin-top:12px;"><button class="btn btn-sm btn-full" data-action="connect-api" data-carrier="${a.id}" style="background:${conn[a.id]?'transparent':a.color};color:${conn[a.id]?a.color:'#fff'};border:2px solid ${a.color};">${conn[a.id]?'🔄 Update Keys':'🔗 Connect '+a.name}</button></div>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════
+// EVENT HANDLING
+// ═══════════════════════════════════════════════════════
+function attachEvents() {
+  document.addEventListener('click', handleClick, {once:true});
+
+  // Live search filters
+  const sf=document.getElementById('ship-filter');
+  if(sf) sf.addEventListener('input',e=>{S.adminShipFilter=e.target.value;ss({});});
+  const pf=document.getElementById('pk-filter');
+  if(pf) pf.addEventListener('input',e=>{S.adminPkFilter=e.target.value;ss({});});
+
+  // Auth tabs
+  const tl=document.getElementById('tab-login'), tr=document.getElementById('tab-reg');
+  if(tl) tl.addEventListener('click',()=>{
+    document.getElementById('auth-area').innerHTML=loginForm();
+    attachAuthBtns();
+    tl.style.cssText='background:linear-gradient(135deg,var(--navy),var(--blue2));color:#fff;';
+    tr.style.cssText='background:transparent;color:var(--muted);';
+  });
+  if(tr) tr.addEventListener('click',()=>{
+    document.getElementById('auth-area').innerHTML=regForm();
+    attachAuthBtns();
+    tr.style.cssText='background:linear-gradient(135deg,var(--navy),var(--blue2));color:#fff;';
+    tl.style.cssText='background:transparent;color:var(--muted);';
+  });
+  attachAuthBtns();
+
+  // Enter key on tracking inputs
+  ['wticcl','dhl','fedex','ups','iata'].forEach(c=>{
+    const el=document.getElementById('trk-'+c);
+    if(el) el.addEventListener('keydown',e=>{ if(e.key==='Enter') doTrack(c); });
+  });
+
+  // Rate upload (demo)
+  const ru=document.getElementById('rate-upload');
+  if(ru) ru.addEventListener('change',()=>toast('Excel upload received — connect backend to parse.','#D97706'));
+}
+
+function attachAuthBtns() {
+  const dl=document.querySelector('[data-action="do-login"]');     if(dl) dl.addEventListener('click',doLogin);
+  const dr=document.querySelector('[data-action="do-register"]');  if(dr) dr.addEventListener('click',doRegister);
+  const da=document.querySelector('[data-action="do-admin-login"]'); if(da) da.addEventListener('click',doAdminLogin);
+}
+
+function handleClick(e) {
+  const el = e.target.closest('[data-action],[data-cpage],[data-apage],[data-cargo]');
+  if (!el) { document.addEventListener('click',handleClick,{once:true}); return; }
+
+  const action=el.dataset.action, cp=el.dataset.cpage, ap=el.dataset.apage, cg=el.dataset.cargo;
+
+  if (cp) { ss({custPage:cp}); return; }
+  if (ap) { ss({adminPage:ap,adminShipFilter:'',adminPkFilter:''}); return; }
+  if (cg) {
+    const px=el.dataset.prefix;
+    if (px==='calc' && S.calcState)   { S.calcState.cargo=cg;   S.calcState.results=null; }
+    if (px==='pk'   && S.pickupState) { S.pickupState.cargo=cg; }
+    if (px==='bk'   && S.bookState)   { S.bookState.cargo=cg;   }
+    ss({}); return;
+  }
+
+  switch(action) {
+    case 'goto-home':       ss({portal:'home'}); break;
+    case 'goto-auth-cust':  ss({portal:'auth-cust'}); break;
+    case 'goto-auth-admin': ss({portal:'auth-admin'}); break;
+    case 'logout':          ss({portal:'home',user:null,custPage:'calculator',adminPage:'dashboard',calcState:null,pickupState:null,bookState:null,trackState:null}); break;
+    case 'do-login':        doLogin(); break;
+    case 'do-register':     doRegister(); break;
+    case 'do-admin-login':  doAdminLogin(); break;
+    case 'do-calc':         doCalc(); break;
+    case 'do-pickup':       doPickup(); break;
+    case 'do-book':         doBook(); break;
+    case 'do-track':        doTrack(el.dataset.carrier); break;
+    case 'fill-track': {
+      const c=el.dataset.carrier, v=el.dataset.val;
+      if(!S.trackState||!S.trackState.wticcl) S.trackState={wticcl:{q:'',err:''},dhl:{q:'',err:''},fedex:{q:'',err:''},ups:{q:'',err:''},iata:{q:'',err:''}};
+      S.trackState[c]={q:v,err:''};
+      ss({}); break;
+    }
+    case 'rate-tab':     ss({adminRateTab:el.dataset.tab}); break;
+    case 'connect-api':  { if(!S.apiConn) S.apiConn={}; S.apiConn[el.dataset.carrier]=true; ss({}); toast(el.dataset.carrier.toUpperCase()+' API connected!'); break; }
+    case 'edit-ship':    openEditShipModal(+el.dataset.idx); break;
+    case 'del-ship':     if(confirm('Delete this shipment?')){ S.shipments.splice(+el.dataset.idx,1); ss({}); toast('Deleted.','#DC2626'); } break;
+    case 'edit-pickup':  openEditPickModal(el.dataset.tok); break;
+    case 'del-pickup':   if(confirm('Delete this pickup?')){ S.pickups=S.pickups.filter(p=>p.token!==el.dataset.tok); ss({}); toast('Deleted.','#DC2626'); } break;
+    case 'edit-user':    openEditUserModal(el.dataset.email); break;
+    case 'del-user':     if(confirm('Remove this customer?')){ S.users=S.users.filter(u=>u.email!==el.dataset.email); ss({}); toast('Removed.','#DC2626'); } break;
+    case 'modal-close':  closeModal(); break;
+    case 'save-ship':    saveShip(); break;
+    case 'save-pickup':  savePickup(); break;
+    case 'save-user':    saveUser(); break;
+  }
+  document.addEventListener('click',handleClick,{once:true});
+}
+
+// ═══════════════════════════════════════════════════════
+// AUTH ACTIONS
+// ═══════════════════════════════════════════════════════
+function authErr(m){ const el=document.getElementById('auth-err'); if(el){el.textContent=m;el.style.display='block';} }
+
+function doLogin() {
+  const email=(document.getElementById('l-email')||{}).value||'';
+  const pass =(document.getElementById('l-pass') ||{}).value||'';
+  if(!email||!pass){ authErr('Email and password are required.'); return; }
+  if(email===ADMIN_EMAIL&&pass===ADMIN_PASS){ ss({portal:'admin',user:{name:'Administrator',email}}); return; }
+  const u=S.users.find(u=>u.email===email);
+  if(u&&(u.pass===pass||pass==='demo')){ ss({portal:'customer',user:u}); return; }
+  if(!u&&pass==='demo'){ const g={name:'Demo Customer',email,phone:'',company:'',pass:'demo',joinedAt:today()}; S.users.push(g); ss({portal:'customer',user:g}); return; }
+  authErr('Invalid email or password.');
+}
+
+function doRegister() {
+  const name   =(document.getElementById('r-name')||{}).value||'';
+  const company=(document.getElementById('r-company')||{}).value||'';
+  const phone  =(document.getElementById('r-phone')||{}).value||'';
+  const email  =(document.getElementById('r-email')||{}).value||'';
+  const pass   =(document.getElementById('r-pass')||{}).value||'';
+  if(!name||!email||!pass){ authErr('Name, email and password are required.'); return; }
+  if(S.users.find(u=>u.email===email)){ authErr('Account already exists.'); return; }
+  const u={name,email,phone,company,pass,joinedAt:today()};
+  S.users.push(u); ss({portal:'customer',user:u});
+}
+
+function doAdminLogin() {
+  const email=(document.getElementById('a-email')||{}).value||'';
+  const pass =(document.getElementById('a-pass') ||{}).value||'';
+  if(email===ADMIN_EMAIL&&pass===ADMIN_PASS){ ss({portal:'admin',user:{name:'Administrator',email}}); return; }
+  authErr('Invalid admin credentials.');
+}
+
+// ═══════════════════════════════════════════════════════
+// CUSTOMER ACTIONS
+// ═══════════════════════════════════════════════════════
+function readCalcForm() {
+  const country=(document.getElementById('calc-country')||{}).value;
+  const zip    =(document.getElementById('calc-zip')||{}).value||'';
+  const weight =(document.getElementById('calc-weight')||{}).value||'';
+  if (country) S.calcState.country=country;
+  if (zip!==undefined) S.calcState.zip=zip;
+  if (weight!==undefined) S.calcState.weight=weight;
+}
+
+function doCalc() {
+  if (!S.calcState) S.calcState={cargo:'printing',country:'USA',zip:'',weight:'',results:null};
+  readCalcForm();
+  const c = S.calcState;
+  // Always clear results first so stale data never shows
+  c.results = null;
+  const w = parseFloat(c.weight)||0;
+  if (!w) { toast('Please enter a valid weight.','#DC2626'); ss({}); return; }
+
+  if (c.cargo==='garments') {
+    const r = garmRate(c.zip, w);
+    c.results = r ? [r] : [];
+  } else if (c.cargo==='printing') {
+    c.results = printRate(c.zip, c.country, w);
+  } else {
+    c.results = 'others';
+  }
+  ss({});
+}
+
+function doPickup() {
+  if (!S.pickupState) S.pickupState={cargo:'printing',fromCountry:'Pakistan',name:S.user.name||'',phone:'',address:'',date:'',slot:'',packages:'1',notes:''};
+  const p=S.pickupState;
+  p.name       =(document.getElementById('pk-name')||{}).value||p.name;
+  p.phone      =(document.getElementById('pk-phone')||{}).value||p.phone;
+  p.address    =(document.getElementById('pk-addr')||{}).value||p.address;
+  p.fromCountry=(document.getElementById('pk-from')||{}).value||p.fromCountry;
+  p.date       =(document.getElementById('pk-date')||{}).value||p.date;
+  p.slot       =(document.getElementById('pk-slot')||{}).value||p.slot;
+  p.packages   =(document.getElementById('pk-pkgs')||{}).value||p.packages;
+  p.notes      =(document.getElementById('pk-notes')||{}).value||p.notes;
+  if (!p.name||!p.address||!p.date){ toast('Please fill Name, Address and Date.','#DC2626'); return; }
+  const token = tkn();
+  S.pickups.push({...p,token,userId:S.user.email,status:'Scheduled',createdAt:today()});
+  ss({});
+  const tb=document.getElementById('pk-token-box');
+  if(tb){
+    tb.style.display='block';
+    tb.innerHTML=`<div class="card" style="border:2px solid var(--gold);background:linear-gradient(135deg,#FFFBF0,#FFF5D6);text-align:center;padding:26px;">
+      <div style="font-size:34px;margin-bottom:10px;">✅</div>
+      <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;">Your WTICCL Pickup Token</div>
+      <div class="mono" style="font-size:30px;font-weight:700;color:var(--navy);letter-spacing:5px;">${token}</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:10px;font-weight:600;">Present this token to our courier on arrival.</div>
+    </div>`;
+  }
+  toast('✅ Pickup scheduled! Token: '+token);
+}
+
+function doBook() {
+  if(!S.bookState) S.bookState={cargo:'printing',from:'Pakistan',to:'USA',zip:'',sName:S.user.name||'',sAddr:'',rName:'',rAddr:'',rPhone:'',weight:'',service:'JFK Direct Flight',desc:''};
+  const b=S.bookState;
+  b.from   =(document.getElementById('bk-from')||{}).value||b.from;
+  b.to     =(document.getElementById('bk-to')||{}).value||b.to;
+  b.zip    =(document.getElementById('bk-zip')||{}).value||b.zip;
+  b.sName  =(document.getElementById('bk-sname')||{}).value||b.sName;
+  b.sAddr  =(document.getElementById('bk-saddr')||{}).value||b.sAddr;
+  b.rName  =(document.getElementById('bk-rname')||{}).value||b.rName;
+  b.rPhone =(document.getElementById('bk-rphone')||{}).value||b.rPhone;
+  b.rAddr  =(document.getElementById('bk-raddr')||{}).value||b.rAddr;
+  b.weight =(document.getElementById('bk-weight')||{}).value||b.weight;
+  b.service=(document.getElementById('bk-service')||{}).value||b.service;
+  b.desc   =(document.getElementById('bk-desc')||{}).value||b.desc;
+  if(!b.rName||!b.weight){ toast('Fill required fields.','#DC2626'); return; }
+  const w=parseFloat(b.weight)||1;
+  let price=0;
+  if(b.cargo==='garments'){ const r=garmRate(b.zip,w); if(r) price=r.price; }
+  else if(b.cargo==='printing'){ const rs=printRate(b.zip,b.to,w); const r=rs.find(r=>r.name===b.service)||rs[0]; if(r) price=r.price; }
+  const trackId=trid();
+  S.shipments.push({...b,trackId,userId:S.user.email,weight:w,price,status:'Processing',createdAt:today(),from:b.from,to:b.to});
+  ss({});
+  const rb=document.getElementById('bk-result-box');
+  if(rb){
+    rb.style.display='block';
+    rb.innerHTML=`<div class="card" style="border:2px solid var(--green);background:linear-gradient(135deg,#ECFDF5,#D1FAE5);text-align:center;padding:26px;">
+      <div style="font-size:34px;margin-bottom:8px;">🎉</div>
+      <div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;">Shipment Confirmed — Tracking ID</div>
+      <div class="mono" style="font-size:20px;font-weight:700;color:var(--navy);letter-spacing:3px;">${trackId}</div>
+      <div style="font-size:13px;color:var(--muted);margin-top:10px;font-weight:600;">Estimated: <strong style="color:var(--navy);font-size:16px;">${pkr(price)}</strong>${price===0?' (contact for quote)':''} · ${esc(b.service)}</div>
+    </div>`;
+  }
+  toast('🎉 Booked! ID: '+trackId);
+}
+
+function doTrack(carrier) {
+  if(!carrier) return;
+  if(!S.trackState||!S.trackState.wticcl) S.trackState={wticcl:{q:'',err:''},dhl:{q:'',err:''},fedex:{q:'',err:''},ups:{q:'',err:''},iata:{q:'',err:''}};
+  const inp=document.getElementById('trk-'+carrier);
+  const q=inp?inp.value.trim().toUpperCase():'';
+  S.trackState[carrier]={q, err: q?'':'Please enter a tracking number.'};
+  ss({});
+}
+
+// ═══════════════════════════════════════════════════════
+// ADMIN MODALS
+// ═══════════════════════════════════════════════════════
+function openEditShipModal(idx) {
+  const s=S.shipments[idx]; if(!s) return;
+  modal(`
+    <div class="modal-header"><span class="modal-title">Edit Shipment</span><button class="modal-close" data-action="modal-close">×</button></div>
+    <input type="hidden" id="m-idx" value="${idx}">
+    <div class="g2">
+      <div class="field"><div class="field-label">From</div>${countryDDL('m-from',s.from)}</div>
+      <div class="field"><div class="field-label">To</div>${countryDDL('m-to',s.to)}</div>
+    </div>
+    <div class="g2">
+      <div class="field"><div class="field-label">Weight (kg)</div><input id="m-wt" class="inp" type="number" value="${esc(s.weight)}"></div>
+      <div class="field"><div class="field-label">Price (PKR)</div><input id="m-price" class="inp" type="number" value="${esc(s.price)}"></div>
+    </div>
+    <div class="field"><div class="field-label">Status</div><select id="m-status" class="inp">${['Processing','In Transit','Out for Delivery','Delivered','Cancelled'].map(v=>`<option${s.status===v?' selected':''}>${v}</option>`).join('')}</select></div>
+    <div class="field"><div class="field-label">Service</div><select id="m-svc" class="inp">${['JFK Direct Flight','Via UK – UPS Expedite','Via UK – UPS Saver','Via UK – DHL','Direct DHL'].map(v=>`<option${s.service===v?' selected':''}>${v}</option>`).join('')}</select></div>
+    <div class="field"><div class="field-label">Recipient Name</div><input id="m-rname" class="inp" value="${esc(s.rName||'')}"></div>
+    <div class="field"><div class="field-label">Recipient Address</div><textarea id="m-raddr" class="inp" rows="2">${esc(s.rAddr||'')}</textarea></div>
+    <div style="display:flex;gap:10px;margin-top:6px;"><button class="btn btn-navy btn-full" data-action="save-ship">💾 Save</button><button class="btn btn-muted btn-full" data-action="modal-close">Cancel</button></div>`);
+}
+function saveShip() {
+  const idx=+document.getElementById('m-idx').value; const s=S.shipments[idx]; if(!s) return;
+  s.from=document.getElementById('m-from').value; s.to=document.getElementById('m-to').value;
+  s.weight=document.getElementById('m-wt').value; s.price=document.getElementById('m-price').value;
+  s.status=document.getElementById('m-status').value; s.service=document.getElementById('m-svc').value;
+  s.rName=document.getElementById('m-rname').value; s.rAddr=document.getElementById('m-raddr').value;
+  closeModal(); ss({}); toast('✅ Shipment updated.');
+}
+
+function openEditPickModal(token) {
+  const p=S.pickups.find(x=>x.token===token); if(!p) return;
+  modal(`
+    <div class="modal-header"><span class="modal-title">Edit Pickup</span><button class="modal-close" data-action="modal-close">×</button></div>
+    <input type="hidden" id="m-tok" value="${esc(token)}">
+    <div class="g2">
+      <div class="field"><div class="field-label">Name</div><input id="m-name" class="inp" value="${esc(p.name)}"></div>
+      <div class="field"><div class="field-label">Phone</div><input id="m-phone" class="inp" value="${esc(p.phone)}"></div>
+    </div>
+    <div class="field"><div class="field-label">Address</div><input id="m-addr" class="inp" value="${esc(p.address)}"></div>
+    <div class="g2">
+      <div class="field"><div class="field-label">Date</div><input id="m-date" class="inp" type="date" value="${esc(p.date)}"></div>
+      <div class="field"><div class="field-label">Status</div><select id="m-pstatus" class="inp">${['Scheduled','Completed','Cancelled'].map(v=>`<option${p.status===v?' selected':''}>${v}</option>`).join('')}</select></div>
+    </div>
+    <div class="field"><div class="field-label">Packages</div><input id="m-pkgs" class="inp" type="number" value="${esc(p.packages)}"></div>
+    <div class="field"><div class="field-label">Notes</div><textarea id="m-notes" class="inp" rows="2">${esc(p.notes||'')}</textarea></div>
+    <div style="display:flex;gap:10px;margin-top:6px;"><button class="btn btn-navy btn-full" data-action="save-pickup">💾 Save</button><button class="btn btn-muted btn-full" data-action="modal-close">Cancel</button></div>`);
+}
+function savePickup() {
+  const tok=document.getElementById('m-tok').value; const p=S.pickups.find(x=>x.token===tok); if(!p) return;
+  p.name=document.getElementById('m-name').value; p.phone=document.getElementById('m-phone').value;
+  p.address=document.getElementById('m-addr').value; p.date=document.getElementById('m-date').value;
+  p.status=document.getElementById('m-pstatus').value; p.packages=document.getElementById('m-pkgs').value;
+  p.notes=document.getElementById('m-notes').value;
+  closeModal(); ss({}); toast('✅ Pickup updated.');
+}
+
+function openEditUserModal(email) {
+  const u=S.users.find(x=>x.email===email); if(!u) return;
+  modal(`
+    <div class="modal-header"><span class="modal-title">Edit Customer</span><button class="modal-close" data-action="modal-close">×</button></div>
+    <input type="hidden" id="m-uemail" value="${esc(email)}">
+    <div class="field"><div class="field-label">Full Name</div><input id="m-uname" class="inp" value="${esc(u.name)}"></div>
+    <div class="field"><div class="field-label">Email (read-only)</div><input class="inp" value="${esc(u.email)}" readonly style="opacity:.6;"></div>
+    <div class="field"><div class="field-label">Phone</div><input id="m-uphone" class="inp" value="${esc(u.phone||'')}"></div>
+    <div class="field"><div class="field-label">Company</div><input id="m-ucompany" class="inp" value="${esc(u.company||'')}"></div>
+    <div style="display:flex;gap:10px;margin-top:6px;"><button class="btn btn-navy btn-full" data-action="save-user">💾 Save</button><button class="btn btn-muted btn-full" data-action="modal-close">Cancel</button></div>`);
+}
+function saveUser() {
+  const email=document.getElementById('m-uemail').value; const u=S.users.find(x=>x.email===email); if(!u) return;
+  u.name=document.getElementById('m-uname').value; u.phone=document.getElementById('m-uphone').value; u.company=document.getElementById('m-ucompany').value;
+  closeModal(); ss({}); toast('✅ Customer updated.');
+}
+
+// ═══════════════════════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════════════════════
+render();
+</script>
+</body>
+</html>
